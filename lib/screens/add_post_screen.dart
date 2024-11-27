@@ -1,9 +1,6 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/models/post.dart';
 import 'package:oxdo_network/providers/add_post_notifiers.dart';
-import 'package:oxdo_network/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
 class AddPostScreen extends StatefulWidget {
@@ -23,9 +20,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   void initState() {
-    myCallBack(() {
-    context.read<AddPostNotifiers>().reset();
-    });
+    final addPostNotifiers = context.read<AddPostNotifiers>();
+
+    // To navigate back
+    addPostNotifiers.onNavigate = () {
+      Navigator.pop(context);
+    };
+
+    // To show snackbar
+    addPostNotifiers.showSnackBar = (value) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(value)));
+    };
+
     super.initState();
   }
 
@@ -44,7 +51,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
       _titleController.text = post.title;
       _bodyController.text = post.body;
       _userIdController.text = post.userId.toString();
-      
     }
     return Scaffold(
       appBar: AppBar(
@@ -53,21 +59,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
       body: Consumer<AddPostNotifiers>(
         builder: (context, value, child) {
           final showProgressBar = value.showProgressBar;
-          final errorMessage = value.error;
-          final isCompleted = value.addedCompleted;
-
-          if (isCompleted) {
-            myCallBack(() {
-              Navigator.pop(context);
-            });
-          }
-
-          if (errorMessage != null) {
-            myCallBack(() {
-              ScaffoldMessenger.of(context)
-                  .showSnackBar(SnackBar(content: Text(errorMessage)));
-            });
-          }
 
           return Stack(
             alignment: Alignment.center,
@@ -127,6 +118,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () async {
+                          FocusScope.of(context).unfocus();
                           if (_formKey.currentState!.validate()) {
                             // Save data
                             final title = _titleController.text.trim();
@@ -147,11 +139,11 @@ class _AddPostScreenState extends State<AddPostScreen> {
                                   .addAPost(p);
                             } else {
                               final p = Post(
-                              id: post.id,
-                              title: title,
-                              body: body,
-                              userId: int.tryParse(userIdString) ?? 0,
-                            );
+                                id: post.id,
+                                title: title,
+                                body: body,
+                                userId: int.tryParse(userIdString) ?? 0,
+                              );
                               context.read<AddPostNotifiers>().editAPost(p);
                             }
                           }
@@ -162,8 +154,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                           foregroundColor:
                               post == null ? Colors.black : Colors.white,
                         ),
-                        child:  Text(post==null ? "Save":"Edit"),
-                      )
+                        child: Text(post == null ? "Save" : "Edit"),
+                      ),
                     ],
                   ),
                 ),

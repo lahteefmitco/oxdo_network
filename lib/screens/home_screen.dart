@@ -1,4 +1,4 @@
-import 'dart:developer';
+
 
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/models/post.dart';
@@ -16,44 +16,37 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
-    context.read<PostNotifiers>().getPosts();
+    final postNotifiers = context.read<PostNotifiers>();
+    postNotifiers.getPosts();
+
+    // To show snackbar
+    postNotifiers.showSnackBar = (value) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(value)));
+    };
     super.initState();
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
     List<Post> posts = [];
     bool showProgressBar = false;
-    String? errorMessage;
 
     return Consumer<PostNotifiers>(
       builder: (BuildContext context, PostNotifiers value, Widget? child) {
         posts = value.posts;
-        for (var element in posts) {
-          log(element.userId.toString());
-        }
-        showProgressBar = value.showProgressBar;
-        errorMessage = value.error;
 
-        if (errorMessage != null) {
-          myCallBack(() {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(errorMessage!)));
-          });
-        }
+        showProgressBar = value.showProgressBar;
+
         return Stack(
           alignment: Alignment.center,
           children: [
             Scaffold(
               floatingActionButton: FloatingActionButton(
-                onPressed: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddPostScreen()));
-                  myCallBack(() {
-                    context.read<PostNotifiers>().getPosts();
-                  });
+                onPressed: () {
+                  _navigate(context, null);
                 },
                 child: const Icon(Icons.add),
               ),
@@ -64,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: (posts.isEmpty && !showProgressBar)
+                // Condition to show Empty data message on screen
                     ? const Center(
                         child: Text(
                           "Empty Data",
@@ -71,10 +65,11 @@ class _HomeScreenState extends State<HomeScreen> {
                               fontSize: 20, fontWeight: FontWeight.w500),
                         ),
                       )
+
+                      // Showing listview
                     : ListView.separated(
                         itemBuilder: (context, index) {
                           final post = posts[index];
-                          log(post.toString());
                           return ListTile(
                             tileColor: Colors.amber[100],
                             title: Text(post.title),
@@ -90,23 +85,16 @@ class _HomeScreenState extends State<HomeScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  onPressed: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => AddPostScreen(
-                                          post: post,
-                                        ),
-                                      ),
-                                    );
-                                    myCallBack(() {
-                                      context.read<PostNotifiers>().getPosts();
-                                    });
+                                  onPressed: () {
+                                    // To edit
+                                    _navigate(context, post);
                                   },
                                   icon: const Icon(Icons.edit),
                                 ),
                                 IconButton(
                                   onPressed: () {
+
+                                    // To delete
                                     context
                                         .read<PostNotifiers>()
                                         .deleteAPost(post.id);
@@ -135,10 +123,18 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
+  void _navigate(BuildContext context, Post? post) async {
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => AddPostScreen(
+                  post: post,
+                )));
+
+    if (!context.mounted) return;
+    context.read<PostNotifiers>().getPosts();
+  }
 }
 
-void myCallBack(void Function() callback) {
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    callback();
-  });
-}
+

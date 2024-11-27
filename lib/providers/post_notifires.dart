@@ -1,17 +1,16 @@
-import 'dart:developer';
+//import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/models/post.dart';
 import 'package:oxdo_network/network_services/post_service.dart';
 
 class PostNotifiers extends ChangeNotifier {
+  Function(String)? showSnackBar;
   List<Post> _posts = [];
   List<Post> get posts => _posts;
+
   bool _showProgressBar = false;
   bool get showProgressBar => _showProgressBar;
-
-  String? _error;
-  String? get error => _error;
 
   Future getPosts() async {
     try {
@@ -20,9 +19,9 @@ class PostNotifiers extends ChangeNotifier {
       _showProgressBar = false;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
       _showProgressBar = false;
       notifyListeners();
+      showSnackBar?.call(e.toString());
     }
   }
 
@@ -31,15 +30,13 @@ class PostNotifiers extends ChangeNotifier {
       _showProgressBar = true;
       notifyListeners();
       await PostService.deleteAPost(path: "/post", id: id);
-      log("deleted", name: "delete");
       await getPosts();
     } catch (e) {
       _showProgressBar = false;
-      log(e.toString());
-      _error = e.toString();
       notifyListeners();
-    }
 
-    //_reset();
+      showSnackBar?.call(e.toString());
+
+    }
   }
 }

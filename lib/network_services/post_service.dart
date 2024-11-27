@@ -1,4 +1,4 @@
-import 'dart:developer';
+//import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:oxdo_network/main.dart';
@@ -10,7 +10,6 @@ class PostService {
     try {
       // get request by dio
       final Response<dynamic> response = await dio.get(path);
-      log("get posts");
       // Check for status code
       if (response.statusCode == 200) {
         final List listOfData = response.data as List;
@@ -26,11 +25,9 @@ class PostService {
       }
     } on DioException catch (e) {
       // Catch dio exception
-      log("dio exception:- $e");
       throw Exception(e.toString());
     } catch (e) {
       // Catching other exception
-      log("other exception:- $e");
 
       throw Exception(e.toString());
     }
@@ -63,11 +60,9 @@ class PostService {
       }
     } on DioException catch (e) {
       // Catch dio exception
-      log("dio exception:- $e");
       throw Exception(e.toString());
     } catch (e) {
       // Catching other exception
-      log("other exception:- $e");
 
       throw Exception(e.toString());
     }
@@ -101,19 +96,15 @@ class PostService {
         // Get the list of post
         final List<Post> list =
             listOfData.map((element) => Post.fromMap(element)).toList();
-        for (var element in list) {
-          log(element.title);
-        }
+        
       } else {
         throw Exception("Unknown response");
       }
     } on DioException catch (e) {
       // Catch dio exception
-      log("dio exception:- $e");
       throw Exception(e.toString());
     } catch (e) {
       // Catching other exception
-      log("other exception:- $e");
 
       throw Exception(e.toString());
     }
@@ -145,19 +136,15 @@ class PostService {
         // Get the list of post
         final List<Post> list =
             listOfData.map((element) => Post.fromMap(element)).toList();
-        for (var element in list) {
-          log(element.title);
-        }
+        
       } else {
         throw Exception("Unknown response");
       }
     } on DioException catch (e) {
       // Catch dio exception
-      log("dio exception:- $e");
       throw Exception(e.toString());
     } catch (e) {
       // Catching other exception
-      log("other exception:- $e");
 
       throw Exception(e.toString());
     }
