@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:oxdo_network/providers/add_post_notifiers.dart';
 import 'package:oxdo_network/providers/post_notifires.dart';
 import 'package:oxdo_network/providers/splash_notifiers.dart';
-import 'package:oxdo_network/screens/home_screen.dart';
+
 import 'package:oxdo_network/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
