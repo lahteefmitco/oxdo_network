@@ -5,7 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/providers/add_post_notifiers.dart';
 import 'package:oxdo_network/providers/post_notifires.dart';
+import 'package:oxdo_network/providers/splash_notifiers.dart';
 import 'package:oxdo_network/screens/home_screen.dart';
+import 'package:oxdo_network/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 
 late final Dio dio;
@@ -37,6 +39,7 @@ void main() {
     ),
   );
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => SplashNotifiers()..getWelcomeMessage()),
     ChangeNotifierProvider(create: (_) => PostNotifiers()),
     ChangeNotifierProvider(create: (_) => AddPostNotifiers()),
   ], child: const MainApp()));
@@ -49,7 +52,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: SplashScreen(),
     );
   }
 }

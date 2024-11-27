@@ -8,6 +8,28 @@ import 'package:oxdo_network/models/post.dart';
 
 class PostService {
   // Get request
+  // fetch welcome message
+  static Future<String> getWelcomeMessage() async {
+    try {
+      // get request by dio without header 
+      final Response<dynamic> response = await dio.get("/");
+      // Check for status code
+      if (response.statusCode == 200) {
+        return response.data as String;
+      } else {
+        throw Exception("Unknown response");
+      }
+    } on DioException catch (e) {
+      // Catch dio exception
+      throw Exception(e.toString());
+    } catch (e) {
+      // Catching other exception
+
+      throw Exception(e.toString());
+    }
+  }
+
+  // Get request
   static Future<List<Post>> getPosts(String path) async {
     try {
       // get request by dio
@@ -55,7 +77,10 @@ class PostService {
         data: post.toJson(),
         // options
         options: Options(
-          headers: {Headers.contentTypeHeader: 'application/json',"key": "oxdo"},
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            "key": "oxdo"
+          },
         ),
       );
 
@@ -92,7 +117,10 @@ class PostService {
 
         // options
         options: Options(
-          headers: {Headers.contentTypeHeader: 'application/json',"key": "oxdo"},
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            "key": "oxdo"
+          },
         ),
       );
 
@@ -129,7 +157,10 @@ class PostService {
 
         // options
         options: Options(
-          headers: {Headers.contentTypeHeader: 'application/json',"key": "oxdo"},
+          headers: {
+            Headers.contentTypeHeader: 'application/json',
+            "key": "oxdo"
+          },
         ),
       );
 
