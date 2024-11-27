@@ -64,46 +64,46 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: (posts.isEmpty && !showProgressBar)
-                    // Condition to show Empty data message on screen
-                    ? const Center(
-                        child: Text(
-                          "Empty Data",
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
+                child: Column(
+                  children: [
+                    SearchBar(
+                      controller: _searchController,
+                      hintText: "Search",
+                      hintStyle: const WidgetStatePropertyAll(
+                          TextStyle(color: Colors.black38)),
+                      trailing: [
+                        IconButton(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            context.read<PostNotifiers>().searchtPosts(
+                                searchText: _searchController.text.trim());
+                          },
+                          icon: const Icon(Icons.search),
                         ),
-                      )
+                        IconButton(
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              _searchController.clear();
+                              context.read<PostNotifiers>().getPosts();
+                            },
+                            icon: const Icon(Icons.clear))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    (posts.isEmpty && !showProgressBar)
+                        // Condition to show Empty data message on screen
+                        ? const Center(
+                            child: Text(
+                              "Empty Data",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.w500),
+                            ),
+                          )
 
-                    // Showing listview
-                    : Column(
-                        children: [
-                          SearchBar(
-                              controller: _searchController,
-                              hintText: "Search",
-                              hintStyle: const WidgetStatePropertyAll(
-                                  TextStyle(color: Colors.black38)),
-                              trailing: [
-                                IconButton(
-                                  onPressed: () {
-                                    FocusScope.of(context).unfocus();
-                                    context.read<PostNotifiers>().searchtPosts(
-                                        searchText:
-                                            _searchController.text.trim());
-                                  },
-                                  icon: const Icon(Icons.search),
-                                ),
-                                IconButton(
-                                    onPressed: () {
-                                      FocusScope.of(context).unfocus();
-                                      _searchController.clear();
-                                      context.read<PostNotifiers>().getPosts();
-                                    },
-                                    icon: const Icon(Icons.clear))
-                              ]),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Expanded(
+                        // Showing listview
+                        : Expanded(
                             child: ListView.separated(
                               itemBuilder: (context, index) {
                                 final post = posts[index];
@@ -151,8 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               itemCount: posts.length,
                             ),
                           ),
-                        ],
-                      ),
+                  ],
+                ),
               ),
             ),
             showProgressBar
