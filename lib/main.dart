@@ -1,4 +1,6 @@
 
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/providers/add_post_notifiers.dart';
@@ -17,23 +19,23 @@ void main() {
     receiveTimeout: const Duration(seconds: 60),
   );
 
-  // dio.interceptors.add(
-  //   InterceptorsWrapper(
-  //     onRequest: (options, handler) {
-  //       log("Requst interceptor ${options.path}");
-  //       handler.next(options);
-  //     },
-  //     onResponse: (response, handler) {
-  //       log("Response interceptor ${response.statusMessage}");
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) {
+        log("Requst interceptor ${options.path}");
+        handler.next(options);
+      },
+      onResponse: (response, handler) {
+        log("Response interceptor ${response.statusMessage}");
 
-  //       handler.next(response);
-  //     },
-  //     onError: (error, handler) {
-  //       log("Error interceptor ${error.message}");
-  //       handler.next(error);
-  //     },
-  //   ),
-  // );
+        handler.next(response);
+      },
+      onError: (error, handler) {
+        log("Error interceptor ${error.message}");
+        handler.next(error);
+      },
+    ),
+  );
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => PostNotifiers()),
     ChangeNotifierProvider(create: (_) => AddPostNotifiers()),

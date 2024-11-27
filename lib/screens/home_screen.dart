@@ -1,4 +1,4 @@
-
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:oxdo_network/models/post.dart';
@@ -14,10 +14,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
   @override
   void initState() {
     final postNotifiers = context.read<PostNotifiers>();
-    postNotifiers.getPosts();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      postNotifiers.getPosts();
+    });
 
     // To show snackbar
     postNotifiers.showSnackBar = (value) {
@@ -27,7 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,6 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         showProgressBar = value.showProgressBar;
 
+        log("Show progress bar $showProgressBar");
+
         return Stack(
           alignment: Alignment.center,
           children: [
@@ -51,13 +60,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Icon(Icons.add),
               ),
               appBar: AppBar(
-                title: const Text("Posts"),
-                centerTitle: true,
+                title: const Text("Home"),
               ),
               body: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: (posts.isEmpty && !showProgressBar)
-                // Condition to show Empty data message on screen
+                    // Condition to show Empty data message on screen
                     ? const Center(
                         child: Text(
                           "Empty Data",
@@ -66,52 +74,84 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       )
 
-                      // Showing listview
-                    : ListView.separated(
-                        itemBuilder: (context, index) {
-                          final post = posts[index];
-                          return ListTile(
-                            tileColor: Colors.amber[100],
-                            title: Text(post.title),
-                            subtitle: Text(post.body),
-                            leading: Text(
-                              post.userId.toString(),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
+                    // Showing listview
+                    : Column(
+                        children: [
+                          SearchBar(
+                              controller: _searchController,
+                              hintText: "Search",
+                              hintStyle: const WidgetStatePropertyAll(
+                                  TextStyle(color: Colors.black38)),
+                              trailing: [
                                 IconButton(
                                   onPressed: () {
-                                    // To edit
-                                    _navigate(context, post);
+                                    FocusScope.of(context).unfocus();
+                                    context.read<PostNotifiers>().searchtPosts(
+                                        searchText:
+                                            _searchController.text.trim());
                                   },
-                                  icon: const Icon(Icons.edit),
+                                  icon: const Icon(Icons.search),
                                 ),
                                 IconButton(
-                                  onPressed: () {
-
-                                    // To delete
-                                    context
-                                        .read<PostNotifiers>()
-                                        .deleteAPost(post.id);
-                                  },
-                                  style: IconButton.styleFrom(
-                                    foregroundColor: Colors.red,
+                                    onPressed: () {
+                                      FocusScope.of(context).unfocus();
+                                      _searchController.clear();
+                                      context.read<PostNotifiers>().getPosts();
+                                    },
+                                    icon: const Icon(Icons.clear))
+                              ]),
+                          const SizedBox(
+                            height: 16,
+                          ),
+                          Expanded(
+                            child: ListView.separated(
+                              itemBuilder: (context, index) {
+                                final post = posts[index];
+                                return ListTile(
+                                  tileColor: Colors.amber[100],
+                                  title: Text(post.title),
+                                  subtitle: Text(post.body),
+                                  leading: Text(
+                                    post.userId.toString(),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                  icon: const Icon(Icons.delete),
-                                ),
-                              ],
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          // To edit
+                                          _navigate(context, post);
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {
+                                          // To delete
+                                          context
+                                              .read<PostNotifiers>()
+                                              .deleteAPost(post.id);
+                                        },
+                                        style: IconButton.styleFrom(
+                                          foregroundColor: Colors.red,
+                                        ),
+                                        icon: const Icon(Icons.delete),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(
+                                height: 16,
+                              ),
+                              itemCount: posts.length,
                             ),
-                          );
-                        },
-                        separatorBuilder: (context, index) => const SizedBox(
-                          height: 16,
-                        ),
-                        itemCount: posts.length,
+                          ),
+                        ],
                       ),
               ),
             ),
@@ -136,5 +176,3 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<PostNotifiers>().getPosts();
   }
 }
-
-

@@ -15,6 +15,7 @@ class PostNotifiers extends ChangeNotifier {
   Future getPosts() async {
     try {
       _showProgressBar = true;
+      notifyListeners();
       _posts = await PostService.getPosts("/posts");
       _showProgressBar = false;
       notifyListeners();
@@ -36,7 +37,19 @@ class PostNotifiers extends ChangeNotifier {
       notifyListeners();
 
       showSnackBar?.call(e.toString());
+    }
+  }
 
+  Future searchtPosts({required String searchText}) async {
+    try {
+      _showProgressBar = true;
+      _posts = await PostService.searchPosts("/search", searchText);
+      _showProgressBar = false;
+      notifyListeners();
+    } catch (e) {
+      _showProgressBar = false;
+      notifyListeners();
+      showSnackBar?.call(e.toString());
     }
   }
 }
