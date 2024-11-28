@@ -36,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> {
         floatingActionButton: showProgressBar
             ? const CircularProgressIndicator()
             : const SizedBox(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: Center(
           child: Text(
             welocmeMessage,
