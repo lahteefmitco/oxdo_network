@@ -17,10 +17,16 @@ void main() {
   // Add base url and other details to dio
   dio.options = BaseOptions(
     baseUrl: "https://node-backend-40ct.onrender.com",
+    //This specifies the maximum amount of time  that the client will wait for the server to establish a connection
     connectTimeout: const Duration(seconds: 60),
+    //This specifies the maximum amount of time  that the client will wait for the server to send a response after the connection is established
     receiveTimeout: const Duration(seconds: 60),
+    //sendTimeout refers to the maximum time that the client will wait for the request
+    sendTimeout: const Duration(seconds: 60)
   );
 
+
+  // interceptors
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {
@@ -38,6 +44,7 @@ void main() {
       },
     ),
   );
+  
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => SplashNotifiers()..getWelcomeMessage()),
     ChangeNotifierProvider(create: (_) => PostNotifiers()),
